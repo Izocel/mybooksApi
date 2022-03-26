@@ -1,0 +1,8 @@
+vendor
+dev
+.history
+.vscode
+config/settings.php
+config/env.php
+prod
+logs

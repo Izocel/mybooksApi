@@ -1,0 +1,332 @@
+openapi: 3.0.1
+info:
+  version: 1.0.4
+  title: Les bases API avec SLIM framework
+  description: Structure de base d'un api créé dans le cadre du cours `Services Web H2022`
+  contact:
+    name: RVÐ - Developper
+    email: webdevteam@rvdprojects.com
+    url: https://rvdprojects.com
+  license:
+    name: "Apache 2.0"
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+host: https://libapi2022.rvdprojects.com
+basePath: ""
+
+servers: 
+  - url: https://libapi2022.rvdprojects.com
+  - url: http://libapi2022.rvdprojects.com
+
+tags:
+- name: All Get
+  description: All get endpoints
+- name: All Post
+  description: All post endpoints
+- name: All Put
+  description: All put endpoints
+- name: All Delete
+  description: All delete endpoints
+
+- name: General
+  description: All about global endpoints
+- name: Users
+  description: All about users endpoints
+
+
+
+schemes:
+- "https"
+- "http"
+paths:
+  /:
+    get:
+      tags:
+        - All Get
+        - General
+      summary: Renvoit la page web de documentation de l'API
+      responses:
+        '200': 
+          description: HTML              
+
+  /docs:
+    get:
+      tags:
+        - All Get
+        - General
+      summary: Renvoit la page web de documentation de l'API
+      responses:
+        '200': 
+          description: HTML
+            
+
+  /users:
+      get:
+        tags: 
+          - All Get
+          - Users
+        summary: Selection d'uagsers multiple.
+        description: ""
+        responses:
+          '201': 
+            description: Une liste d'usagers
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/User'
+
+          '400': 
+            description: Erreur de validation lors de la requête
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UsersQueryValidationErrors'
+
+          '404': 
+            description: Aucun usager trouvé selon les critères
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UsersNotFoundErrors'
+      post:
+        tags: 
+          - All Post
+          - Users
+        summary: Création d'un usager.
+        requestBody:
+          description: Les informations de l'usager à créer
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+        responses:
+          '201': 
+            description: Le id de l'usager créé
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    user_id:
+                      type: integer
+          '400': 
+            description: Erreur de validation lors de la requête
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UserInputValidationErrors'
+        security:
+        x-codegen-request-body-name: body
+
+  /user/{id}:
+      put:
+        tags: 
+          - All Put
+          - Users
+        summary: Mise à jour d'un usager.
+        requestBody:
+          description: Les informations de l'usager à modifier
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/anonymousSchema/UserUpdate'
+        responses:
+          '200': 
+            description: L'information de l'usager mis à jour
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+
+          '400': 
+            description: Erreur de validation lors de la requête
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UserInputValidationErrors'
+
+          '404':
+            description: Aucun usager trouvé selon les critères
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UserNotFoundErrors'
+
+      get:
+        tags:
+          - All Get
+          - Users
+        summary: Sélection d'un usager.
+        responses:
+          '201': 
+            description: L'information de l'usager
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+                    
+          '404': 
+            description: Aucun usager trouvé selon les critères
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UserNotFoundErrors'
+      delete:
+        tags:
+          - All Delete
+          - Users
+        summary: Suppression d'un usager.
+        responses:
+          '200': 
+            description: L'information de l'usager avant la suppression
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+                    
+          '404': 
+            description: Aucun usager trouvé selon les critères
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/errorSchema/UserNotFoundErrors'
+
+components:
+  schemas:
+
+    Welcome:
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Hello world"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example : 1
+        username:
+          type: string
+          example: "BobyElKapunski42"
+        first_Name:
+          type: string
+          example: "Boby"
+        last_Name:
+          type: string
+          example: "Kapunski"
+        email:
+          type: string
+          example: "bobkapun42@xyz.com"
+    
+
+  anonymousSchema:
+
+    UserUpdate:
+      type: object
+      properties: 
+        username:
+          type: string
+          example: "BobyElKapunski42"
+        first_Name:
+          type: string
+          example: "Boby"
+        last_Name:
+          type: string
+          example: "Kapunski"
+        email:
+          type: string
+          example: "bobkapun42@xyz.com"
+
+
+  errorSchema:
+
+    UserInputValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            errrorDescription:
+              type: string
+            username:
+              type: string
+              example: Le champ username unique est requis
+            first_name:
+              type: string
+              example: Le champ first_name est requis
+            last_name:
+              type: string
+              example: Le champ last_name est requis
+            email:
+              type: string
+              example: Le champ email est requis et doit être valide'
+
+
+    UsersQueryValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            errrorDescription:
+              type: string
+              example: Échec de la selection d'usagers
+            users/{&filter}:
+              type: string
+              example: Erreur retouvé dans ce paramêtre
+            users/{&order}:
+              type: string
+              example: Erreur retouvé dans ce paramêtre
+            users/{&include}:
+              type: string
+              example: Erreur retouvé dans ce paramêtre
+            users/{&exclude}:
+              type: string
+              example: Erreur retouvé dans ce paramêtre
+            users/{&limit}:
+              type: string
+              example: Erreur retouvé dans ce paramêtre
+
+    UsersNotFoundErrors:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            errrorDescription:
+              type: string
+              example: Échec de la selection des usagers
+            users/{&query}:
+              type: string
+              example: Aucun usager trouvé selon les critères
+
+    UserNotFoundErrors:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            errrorDescription:
+              type: string
+              example: Échec de la selection de l'usager
+            user/{id}:
+              type: string
+              example: Aucun usager associé à cet identifiant
+      
